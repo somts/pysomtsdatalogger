@@ -1,0 +1,80 @@
+# pysomtsdatalogger.yaml
+#  Configuration file for pysomtsdatalogger.py
+#
+#  Consists of a hash of structured data containing a 'main' module and
+#  n number of channel modules. Schema for these two types of modules
+#  are defined in the PySOMTSDataLogger.validate_conf() class method.
+---
+main:
+  basedirectory: /tmp/pysomtsdatalogger
+  logfile: pysomtsdatalogger.log
+  perdaylogfiles: true
+  prefixlogfiles: true
+
+# We need a dict of consumers that will subscribe to various RabbitMQ
+# routing channels and record the data to disk.
+consumers:
+  udp-unicast-3:
+    inop: false
+    comments: solo consumer
+    dataformat: ascii
+    description: UDP listener to prove unicast works
+    producer: { ip: 127.0.0.1, port: 5762 }
+
+# We need a dict of producers that will consume network and/or serial
+# streams, and publish the (possibly timestamped) data to RabbitMQ. We
+# can also toggle a bool to consume what we produce, directly.
+producers:
+  udp-unicast-1:
+    inop: false
+    comments: UDP unicast tester
+    dataformat: ascii
+    description: UDP listener to prove unicast works
+    manufacturer: None
+    measures: [nuffin]
+    inputinet: { ip: 127.0.0.1, port: 28002 }
+    selfconsume: true
+  udp-unicast-2:
+    inop: true
+    inopreason: I hate UDP
+    comments: UDP unicast tester
+    dataformat: ascii
+    description: UDP listener to prove unicast works in INOP mode
+    manufacturer: None
+    measures: [nuffin]
+    inputinet: { ip: 127.0.0.1, port: 28003 }
+  udp-inaddr_broadcast-1:
+    comments: UDP broadcast tester for all NICs
+    addtimestamp: true
+    dataformat: ascii
+    description: UDP listener to prove broadcasting works
+    manufacturer: None
+    measures: [nuffin]
+    inputinet: { ip: '<broadcast>', port: 28004 }
+  udp-inaddr_any-1:
+    comments: UDP broadcast tester for all NICs
+    dataformat: ascii
+    description: UDP listener to prove broadcasting works
+    manufacturer: None
+    measures: [nuffin]
+    inputinet: { ip: '', port: 28005 }
+  udp-subnetbroadcast-1:
+    comments: UDP broadcast tester for a specific subnet
+    dataformat: ascii
+    description: UDP listener to prove broadcasting works
+    manufacturer: None
+    measures: [nuffin]
+    inputinet: { ip: '192.168.2.255', port: 28006 }
+  fake-gps-serial-1:
+    inop: true
+    inopreason: no serial ports on tester machine
+    dataformat: nmea0183
+    description: GPS
+    directory: gps
+    manufacturer: Your Mom
+    measures: [position, course, speed, altitude]
+    model: Your Kid
+    serialnumber: '12345'
+    timeoutms: 1000
+    inputserial: { port: /dev/ttyRP10, baudrate: 19200 }
+...
